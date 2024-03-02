@@ -16,8 +16,6 @@ ENV HOST_CONF_PORT 80
 WORKDIR ${APP_INSTALL_PATH}
 
 COPY scripts .
-COPY config ./config
-COPY VERSION ./config
 
 RUN apk add --no-cache openvpn easy-rsa bash netcat-openbsd zip curl dumb-init && \
     ln -s /usr/share/easy-rsa/easyrsa /usr/bin/easyrsa && \
