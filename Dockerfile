@@ -19,8 +19,7 @@ COPY scripts .
 
 RUN apk add --no-cache openvpn easy-rsa bash netcat-openbsd zip curl dumb-init && \
     ln -s /usr/share/easy-rsa/easyrsa /usr/bin/easyrsa && \
-    mkdir -p ${APP_PERSIST_DIR} && \
-    cp config/server.conf /etc/openvpn/server.conf
+    mkdir -p ${APP_PERSIST_DIR}
 
 EXPOSE 1194/udp
 
