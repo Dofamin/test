@@ -1,18 +1,7 @@
 #!/bin/bash
 source ./functions.sh
 
-if [[ $? -ne 0 ]] ; then
-    exit 1
-fi
-
 HOST_ADDR=$(ip route get 1.2.3.4 | awk '{print $7}')
-
-mkdir -p /dev/net
-
-if [ ! -c /dev/net/tun ]; then
-    echo "$(datef) Creating tun/tap device."
-    mknod /dev/net/tun c 10 200
-fi
 
 cd "$APP_PERSIST_DIR" || exit
 
@@ -41,9 +30,14 @@ if [ "$1" == "" ];
 then
 cp -anf /OpenVpn/* /OpenVpn_data/
 sed -i "/local/c\local $HOST_ADDR" "${APP_PERSIST_DIR}/configs/server.conf"
+mkdir -p /dev/net
+if [ ! -c /dev/net/tun ]; then
+    echo "$(datef) Creating tun/tap device."
+    mknod /dev/net/tun c 10 200
+fi
 openvpn --config "${APP_PERSIST_DIR}/configs/server.conf" --dev tun --tls-server & tail -f /dev/null
 else
 cp -anf /OpenVpn/* /OpenVpn_data/
 sed -i "/local/c\local $HOST_ADDR" "${APP_PERSIST_DIR}/configs/server.conf"
-exec "$1"
+exec "$@"
 fi

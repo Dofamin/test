@@ -8,7 +8,8 @@ function datef() {
 
 function createConfig() {
     cd "$APP_PERSIST_DIR/server" || exit
-    # Redirect stderr to the black hole
+
+
     if [ "$PASSWORD_PROTECTED" -eq 1 ]; then
         easyrsa build-client-full "$CLIENT_ID"
     else
@@ -16,9 +17,11 @@ function createConfig() {
 yes
 EOF
     fi
+
     mkdir -p $CLIENT_PATH
     cp "pki/inline/$CLIENT_ID.inline" ta.key $CLIENT_PATH
     cp "$APP_PERSIST_DIR/configs/client.ovpn" "$CLIENT_PATH"
+
     echo -e "\nremote $RESOLVED_HOST_ADDR $HOST_TUN_PORT" >> "$CLIENT_PATH/client.ovpn"
     # Embed client authentication files into config file
     cat "$CLIENT_PATH/$CLIENT_ID.inline" <(echo -e '<tls-auth>') \
@@ -26,21 +29,8 @@ EOF
         >> "$CLIENT_PATH/client.ovpn"
     # Append client id info to the config
     echo ";client-id $CLIENT_ID" >> "$CLIENT_PATH/client.ovpn"
-    echo $CLIENT_PATH
+    echo "$CLIENT_PATH"
 }
-
-function removeConfig() {
-    local name="$1"
-    cd "$APP_PERSIST_DIR/server" || exit
-    easyrsa revoke $name << EOF
-yes
-EOF
-    easyrsa gen-crl
-    rm -rf "$APP_PERSIST_DIR/clients/$CLIENT_ID"
-    cd "$APP_PERSIST_DIR" || exit
-}
-
-RESOLVED_HOST_ADDR=$(curl -s  ifconfig.co/ip)
 
 function generateClientConfig() {
     #case
@@ -56,15 +46,31 @@ function generateClientConfig() {
             CLIENT_ID="$2"
             PASSWORD_PROTECTED=1
             ;;
+        *)
+            CLIENT_ID="$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)"
+            ;;
     esac
     CLIENT_PATH="$APP_PERSIST_DIR/clients/$CLIENT_ID"
-    if [ -d $CLIENT_PATH ]; then
+    if [ -d "$CLIENT_PATH" ]; then
         echo "$(datef) Client with this id [$CLIENT_ID] already exists"
         exit 1
     else
         createConfig
     fi
-    FILE_NAME=client.ovpn
+    FILE_NAME="$CLIENT_ID.ovpn"
     FILE_PATH="$CLIENT_PATH/$FILE_NAME"
     echo "$(datef) $FILE_PATH file has been generated"
 }
+
+function removeConfig() {
+    local CLIENT_ID="$1"
+    cd "$APP_PERSIST_DIR/server" || exit
+    easyrsa revoke "$CLIENT_ID" << EOF
+yes
+EOF
+    easyrsa gen-crl
+    mv "$APP_PERSIST_DIR/clients/$CLIENT_ID" "$APP_PERSIST_DIR/clients/removed/$CLIENT_ID"
+    cd "$APP_PERSIST_DIR" || exit
+}
+
+RESOLVED_HOST_ADDR=$(curl -s  ifconfig.co/ip)
