@@ -28,7 +28,7 @@ fi
 
 if [ "$1" == "" ];
 then
-cp -anf /OpenVpn/* /OpenVpn_data/
+cp -an /OpenVpn/* /OpenVpn_data/
 sed -i "/local/c\local $HOST_ADDR" "${APP_PERSIST_DIR}/configs/server.conf"
 mkdir -p /dev/net
 if [ ! -c /dev/net/tun ]; then
@@ -37,7 +37,7 @@ if [ ! -c /dev/net/tun ]; then
 fi
 openvpn --config "${APP_PERSIST_DIR}/configs/server.conf" --dev tun --tls-server & tail -f /dev/null
 else
-cp -anf /OpenVpn/* /OpenVpn_data/
+cp -an /OpenVpn/* /OpenVpn_data/
 sed -i "/local/c\local $HOST_ADDR" "${APP_PERSIST_DIR}/configs/server.conf"
 exec "$@"
 fi
