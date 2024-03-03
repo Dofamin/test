@@ -4,22 +4,21 @@ LABEL maintainer="Roman Filippov <FilippovRV1@transport.mos.ru>"
 
 # System settings. User normally shouldn't change these parameters
 ENV APP_NAME OpenVpn
-ENV APP_INSTALL_PATH /opt/${APP_NAME}
-ENV APP_PERSIST_DIR /opt/${APP_NAME}_data
+ENV APP_PERSIST_DIR /${APP_NAME}
 
 # Configuration settings with default values
 ENV NET_ADAPTER eth0
-ENV HOST_ADDR ""
 ENV HOST_TUN_PORT 1194
-ENV HOST_CONF_PORT 80
 
-WORKDIR ${APP_INSTALL_PATH}
+WORKDIR ${APP_PERSIST_DIR}
 
 COPY scripts .
+COPY configs .configs/
 
 RUN apk add --no-cache openvpn easy-rsa bash netcat-openbsd zip curl dumb-init && \
     ln -s /usr/share/easy-rsa/easyrsa /usr/bin/easyrsa && \
-    mkdir -p ${APP_PERSIST_DIR}
+    mkdir -p ${APP_PERSIST_DIR} && \
+    chmod +x ./*.sh
 
 EXPOSE 1194/udp
 

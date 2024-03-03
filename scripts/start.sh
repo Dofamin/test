@@ -5,6 +5,8 @@ if [[ $? -ne 0 ]] ; then
     exit 1
 fi
 
+HOST_ADDR=$(ip route get 1.2.3.4 | awk '{print $7}')
+
 mkdir -p /dev/net
 
 if [ ! -c /dev/net/tun ]; then
@@ -15,38 +17,30 @@ fi
 cd "$APP_PERSIST_DIR" || exit
 
 # Generate certs if folder don't exist
-if [ ! -f "$APP_PERSIST_DIR/server/pki" ]; then
+if [ ! -d "$APP_PERSIST_DIR/server/pki" ]; then
         mkdir -p "${APP_PERSIST_DIR}/server"
         cd "${APP_PERSIST_DIR}/server" || exit
-        easyrsa init-pki
-        easyrsa gen-dh
-        # DH parameters of size 2048 created at /usr/share/easy-rsa/pki/dh.pem
-        # Copy DH file
-        cp pki/dh.pem /etc/openvpn
+        easyrsa --batch init-pki
+        easyrsa --batch gen-dh
         easyrsa build-ca nopass <<- EOF
 
 EOF
-        # CA creation complete and you may now import and sign cert requests.
-        # Your new CA certificate file for publishing is at:
-        # /opt/OpenVpn_data/pki/ca.crt
-        easyrsa gen-req MyReq nopass << EOF2
+        easyrsa gen-req vpn-server nopass << EOF1
 
+EOF1
+        easyrsa sign-req server vpn-server << EOF2
+yes
 EOF2
-        # Keypair and certificate request completed. Your files are:
-        # req: /opt/OpenVpn_data/pki/reqs/Server.req
-        # key: /opt/OpenVpn_data/pki/private/Server.key
-        easyrsa sign-req server MyReq << EOF3
+        openvpn --genkey secret ta.key<< EOF3
 yes
 EOF3
-        # Certificate created at: /opt/OpenVpn_data/pki/issued/Server.crt
-        openvpn --genkey --secret ta.key << EOF4
-yes
-EOF4
         easyrsa gen-crl
-        # Copy server keys and certificates
-        cp pki/dh.pem pki/ca.crt pki/issued/MyReq.crt pki/private/MyReq.key pki/crl.pem ta.key /etc/openvpn
 fi
 
-
-cd "$APP_INSTALL_PATH" || exit
-openvpn --config "${APP_PERSIST_DIR}/server/server.conf" & tail -f /dev/null
+if [ "$1" == "" ];
+then
+sed -i "/local/c\local $HOST_ADDR" "${APP_PERSIST_DIR}/config/server.conf"
+openvpn --config "${APP_PERSIST_DIR}/config/server.conf" --dev tun --tls-server & tail -f /dev/null
+else
+exec "$1"
+fi
