@@ -1,0 +1,14 @@
+#!/usr/bin/expect -f
+set timeout -1
+
+lassign $argv USERNAME MY_PASSPHRASE
+cd /OpenVpn_data/server
+spawn easyrsa build-client-full $USERNAME
+
+expect "Enter PEM pass phrase:"
+send -- "$MY_PASSPHRASE \r"
+expect "Verifying - Enter PEM pass phrase:"
+send -- "$MY_PASSPHRASE \r\n"
+expect "  Confirm request details:"
+send -- "yes\r\n"
+expect eof

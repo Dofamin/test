@@ -11,7 +11,7 @@ function createConfig() {
 
 
     if [ "$PASSWORD_PROTECTED" -eq 1 ]; then
-        easyrsa build-client-full "$CLIENT_ID"
+        expect ./build-client-full.exp "$CLIENT_ID" "$CLIENT_PASSWORD"
     else
         easyrsa build-client-full "$CLIENT_ID" nopass  << EOF
 yes
@@ -44,6 +44,7 @@ function generateClientConfig() {
             ;;
         np)
             CLIENT_ID="$2"
+            CLIENT_PASSWORD="$3"
             PASSWORD_PROTECTED=1
             ;;
         *)
@@ -69,7 +70,6 @@ function removeConfig() {
 yes
 EOF
     easyrsa gen-crl
-    mv "$APP_PERSIST_DIR/clients/$CLIENT_ID" "$APP_PERSIST_DIR/clients/removed/$CLIENT_ID"
     cd "$APP_PERSIST_DIR" || exit
 }
 

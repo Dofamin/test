@@ -16,7 +16,7 @@ WORKDIR ${APP_INSTALL_PATH}
 COPY scripts .
 COPY configs ./configs
 
-RUN apk add --no-cache openvpn easy-rsa bash netcat-openbsd zip curl dumb-init && \
+RUN apk add --no-cache openvpn easy-rsa bash netcat-openbsd zip curl dumb-init expect && \
     ln -s /usr/share/easy-rsa/easyrsa /usr/bin/easyrsa && \
     mkdir -p ${APP_PERSIST_DIR} && \
     chmod +x ./*.sh
