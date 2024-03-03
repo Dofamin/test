@@ -17,10 +17,9 @@ COPY configs .configs/
 
 RUN apk add --no-cache openvpn easy-rsa bash netcat-openbsd zip curl dumb-init && \
     ln -s /usr/share/easy-rsa/easyrsa /usr/bin/easyrsa && \
-    mkdir -p ${APP_PERSIST_DIR} && \
     chmod +x ./*.sh
 
 EXPOSE 1194/udp
 
-ENTRYPOINT [ "dumb-init", "./start.sh" ]
+ENTRYPOINT [ "dumb-init", "./OpenVpn/start.sh" ]
 CMD [ "" ]
