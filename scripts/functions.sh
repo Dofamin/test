@@ -17,11 +17,11 @@ yes
 EOF
     fi
     mkdir -p $CLIENT_PATH
-    cp "pki/inline/$name.inline" ta.key $CLIENT_PATH
+    cp "pki/inline/$CLIENT_ID.inline" ta.key $CLIENT_PATH
     cp "$APP_PERSIST_DIR/configs/client.ovpn" "$CLIENT_PATH"
     echo -e "\nremote $RESOLVED_HOST_ADDR $HOST_TUN_PORT" >> "$CLIENT_PATH/client.ovpn"
     # Embed client authentication files into config file
-    cat "$CLIENT_PATH/$name.inline" <(echo -e '<tls-auth>') \
+    cat "$CLIENT_PATH/$CLIENT_ID.inline" <(echo -e '<tls-auth>') \
         "$CLIENT_PATH/ta.key" <(echo -e '</tls-auth>') \
         >> "$CLIENT_PATH/client.ovpn"
     # Append client id info to the config
@@ -36,6 +36,7 @@ function removeConfig() {
 yes
 EOF
     easyrsa gen-crl
+    rm -rf "$APP_PERSIST_DIR/clients/$CLIENT_ID"
     cd "$APP_PERSIST_DIR" || exit
 }
 
@@ -54,9 +55,6 @@ function generateClientConfig() {
         np)
             CLIENT_ID="$2"
             PASSWORD_PROTECTED=1
-            ;;
-        *)
-            CLIENT_ID="$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)"
             ;;
     esac
     CLIENT_PATH="$APP_PERSIST_DIR/clients/$CLIENT_ID"
