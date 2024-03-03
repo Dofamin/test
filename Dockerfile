@@ -14,7 +14,7 @@ ENV HOST_TUN_PORT 1194
 WORKDIR ${APP_INSTALL_PATH}
 
 COPY scripts .
-COPY configs .configs/
+COPY configs ./configs
 
 RUN apk add --no-cache openvpn easy-rsa bash netcat-openbsd zip curl dumb-init && \
     ln -s /usr/share/easy-rsa/easyrsa /usr/bin/easyrsa && \
@@ -23,5 +23,5 @@ RUN apk add --no-cache openvpn easy-rsa bash netcat-openbsd zip curl dumb-init &
 
 EXPOSE 1194/udp
 
-# ENTRYPOINT [ "dumb-init", "./OpenVpn/start.sh" ]
-CMD [ "bash" ]
+ENTRYPOINT [ "dumb-init", "./OpenVpn/start.sh" ]
+CMD [ "" ]
