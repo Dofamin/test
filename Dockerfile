@@ -24,5 +24,5 @@ RUN apk add --no-cache openvpn easy-rsa bash netcat-openbsd zip curl dumb-init e
 EXPOSE 1194/udp
 
 WORKDIR ${APP_PERSIST_DIR}
-ENTRYPOINT [ "dumb-init", "./OpenVpn/start.sh" ]
+ENTRYPOINT [ "dumb-init", "/OpenVpn/start.sh" ]
 CMD [ "" ]
