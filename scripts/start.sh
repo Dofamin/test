@@ -45,6 +45,5 @@ openvpn --config "${APP_PERSIST_DIR}/configs/server.conf" --dev tun --tls-server
 else
 cp -an /OpenVpn/* /OpenVpn_data/
 sed -i "/local/c\local $HOST_ADDR" "${APP_PERSIST_DIR}/configs/server.conf"
-cp -an /OpenVpn /OpenVpn_data
 exec "$1"
 fi
