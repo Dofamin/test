@@ -11,7 +11,7 @@ function createConfig() {
 
 
     if [ "$PASSWORD_PROTECTED" -eq 1 ]; then
-        expect ./build-client-full.exp "$CLIENT_ID" "$CLIENT_PASSWORD"
+        expect "$APP_PERSIST_DIR/build-client-full.exp" "$CLIENT_ID" "$CLIENT_PASSWORD"
     else
         easyrsa build-client-full "$CLIENT_ID" nopass  << EOF
 yes

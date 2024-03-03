@@ -6,9 +6,9 @@ cd /OpenVpn_data/server
 spawn easyrsa build-client-full $USERNAME
 
 expect "Enter PEM pass phrase:"
-send -- "$MY_PASSPHRASE \r"
+send -- "$MY_PASSPHRASE\r"
 expect "Verifying - Enter PEM pass phrase:"
-send -- "$MY_PASSPHRASE \r\n"
+send -- "$MY_PASSPHRASE\r"
 expect "  Confirm request details:"
-send -- "yes\r\n"
+send -- "yes\r"
 expect eof
