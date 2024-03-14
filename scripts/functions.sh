@@ -20,15 +20,15 @@ EOF
 
     mkdir -p $CLIENT_PATH
     cp "pki/inline/$CLIENT_ID.inline" ta.key $CLIENT_PATH
-    cp "$APP_PERSIST_DIR/configs/client.ovpn" "$CLIENT_PATH"
+    cp "$APP_PERSIST_DIR/configs/$CLIENT_ID.ovpn" "$CLIENT_PATH"
 
-    echo -e "\nremote $RESOLVED_HOST_ADDR $HOST_TUN_PORT" >> "$CLIENT_PATH/client.ovpn"
+    echo -e "\nremote $RESOLVED_HOST_ADDR $HOST_TUN_PORT" >> "$CLIENT_PATH/$CLIENT_ID.ovpn"
     # Embed client authentication files into config file
     cat "$CLIENT_PATH/$CLIENT_ID.inline" <(echo -e '<tls-auth>') \
         "$CLIENT_PATH/ta.key" <(echo -e '</tls-auth>') \
-        >> "$CLIENT_PATH/client.ovpn"
+        >> "$CLIENT_PATH/$CLIENT_ID.ovpn"
     # Append client id info to the config
-    echo ";client-id $CLIENT_ID" >> "$CLIENT_PATH/client.ovpn"
+    echo ";client-id $CLIENT_ID" >> "$CLIENT_PATH/$CLIENT_ID.ovpn"
     echo "$CLIENT_PATH"
 }
 
